@@ -1,0 +1,48 @@
+html {
+    height: 100%;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    min-height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.header {
+    background-color: white;
+}
+
+.header__inner {
+    margin: 0 auto;
+    padding: 20px 15px;
+    max-width: 1230px;
+}
+
+.header__logo {
+    color: black;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 26px;
+}
+
+main {
+    flex: 1;
+    background-color: #f2f2f2;
+}
+
+.footer {
+    background-color: white;
+}
+
+.footer__inner {
+    margin: 0 auto;
+    padding: 10px 15px;
+    max-width: 1230px;
+    text-align: center;
+}
+
+.footer__copyright {
+    font-weight: bold;
+}
