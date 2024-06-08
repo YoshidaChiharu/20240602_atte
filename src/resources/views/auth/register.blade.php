@@ -36,11 +36,11 @@
             </div>
             <div class="form__group">
                 <input type="text" class="form__group-input" name="password_confirmation" placeholder="確認用パスワード">
-                <div class="form__group-error">
+                <!-- <div class="form__group-error">
                     @error('password')
                     {{ $message }}
                     @enderror
-                </div>
+                </div> -->
             </div>
             <div class="form__button">
                 <button class="form__button-submit">会員登録</button>

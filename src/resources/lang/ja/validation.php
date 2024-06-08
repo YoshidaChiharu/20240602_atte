@@ -130,8 +130,8 @@ return [
     */
 
     'custom' => [
-        'attribute-name' => [
-            'rule-name' => 'custom-message',
+        'password' => [
+            'regex' => '使用できない文字が含まれています（使用可能文字: 「a～z」「A～Z」「0～9」「-」「_」「+」「@」）',
         ],
     ],
 
