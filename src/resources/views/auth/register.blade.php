@@ -17,7 +17,7 @@
                     {{ $message }}
                     @enderror
                 </div>
-                </div>
+            </div>
             <div class="form__group">
                 <input type="text" class="form__group-input" name="email" placeholder="メールアドレス" value="{{ old('email') }}">
                 <div class="form__group-error">
@@ -48,7 +48,7 @@
         </form>
         <div class="login">
             <p class="login-text">アカウントをお持ちの方はこちらから</p>
-            <a href="#" class="login-link">ログイン</a>
+            <a href="/login" class="login-link">ログイン</a>
         </div>
     </div>
 </div>
