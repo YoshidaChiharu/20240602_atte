@@ -13,7 +13,7 @@ class LoginRequest extends FortifyLoginRequest
      */
     public function authorize()
     {
-        return false;
+        return true;
     }
 
     /**
@@ -24,7 +24,18 @@ class LoginRequest extends FortifyLoginRequest
     public function rules()
     {
         return [
-            //
+            'email' => [
+                'required',
+                'string',
+                'email',
+                'max:254',
+            ],
+            'password' => [
+                'required',
+                'string',
+                'between:8,20',
+                'regex:/^[a-zA-Z0-9-_+@]+$/',
+            ],
         ];
     }
 }
