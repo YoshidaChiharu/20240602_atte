@@ -16,6 +16,26 @@
                     Atte
                 </a>
             </div>
+            <div class="header__nav--outer">
+                @if(Auth::check())
+                <nav>
+                    <ul class="header__nav">
+                        <li>
+                            <a class="header__nav-item" href="/">ホーム</a>
+                        </li>
+                        <li>
+                            <a class="header__nav-item" href="/attendance">日付一覧</a>
+                        </li>
+                        <li>
+                            <form action="/logout" method="post">
+                                @csrf
+                                <button class="header__nav-item">ログアウト</button>
+                            </form>
+                        </li>
+                    </ul>
+                </nav>
+                @endif
+            </div>
         </div>
     </header>
     <main>
