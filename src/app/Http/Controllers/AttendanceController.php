@@ -3,11 +3,13 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Auth;
 
 class AttendanceController extends Controller
 {
     // 打刻ページ表示
     public function index() {
-        return view('punch');
+        $name = Auth::user()->name;
+        return view('punch', compact('name'));
     }
 }

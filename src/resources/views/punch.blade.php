@@ -6,7 +6,7 @@
 
 @section('content')
 <div class="container">
-    <div class="container__heading">nameさんお疲れ様です！</div>
+    <div class="container__heading">{{$name}}さんお疲れ様です！</div>
     <div class="container__content">
         <form action="/" class="punch-form" method="post">
             @csrf
