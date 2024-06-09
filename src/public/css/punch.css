@@ -1,0 +1,30 @@
+.container {
+    margin: 40px auto;
+    padding: 20px 15px;
+    max-width: 1000px;
+}
+
+.container__heading {
+    padding-bottom: 40px;
+    text-align: center;
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.punch-form {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 40px;
+}
+
+.form__input {
+    width: 45%;
+    padding: 60px 0;
+    text-align: center;
+    background-color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 20px;
+    font-weight: bold;
+}
