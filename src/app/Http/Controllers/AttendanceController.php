@@ -11,8 +11,10 @@ class AttendanceController extends Controller
 {
     // 打刻ページ表示
     public function index() {
-        $name = Auth::user()->name;
-        return view('punch', compact('name'));
+        $auths = Auth::user();
+        $name = $auths->name;
+        $status = $auths->status;
+        return view('punch', compact(['name', 'status']));
     }
 
     // 打刻処理

@@ -10,10 +10,10 @@
     <div class="container__content">
         <form action="/" class="punch-form" method="post">
             @csrf
-            <input type="submit" class="form__input" name="punch_in" value="勤務開始">
-            <input type="submit" class="form__input" name="punch_out" value="勤務終了">
-            <input type="submit" class="form__input" name="rest_in" value="休憩開始">
-            <input type="submit" class="form__input" name="rest_out" value="休憩終了">
+            <input type="submit" class="form__input" name="punch_in" value="勤務開始" {{ $status == 0 ? '' : 'disabled' }}>
+            <input type="submit" class="form__input" name="punch_out" value="勤務終了" {{ $status == 1 ? '' : 'disabled' }}>
+            <input type="submit" class="form__input" name="rest_in" value="休憩開始"  {{ $status == 1 ? '' : 'disabled' }}>
+            <input type="submit" class="form__input" name="rest_out" value="休憩終了"  {{ $status == 2 ? '' : 'disabled' }}>
         </form>
     </div>
 </div>
