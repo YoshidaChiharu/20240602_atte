@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Work;
+use App\Models\Rest;
 use Auth;
 use Carbon\Carbon;
 
@@ -54,20 +55,40 @@ class AttendanceController extends Controller
     private function punchOut($user) {
         $now = Carbon::now();
 
-        $work = ["finished_at" => $now->format('H:i:s')];
-        Work::where('user_id', $user->id)
-            ->where('work_on', $now->format('Y-m-d'))
-            ->update($work);
+        $user->work
+            ->sortByDesc('work_on')
+            ->first()
+            ->update(["finished_at" => $now->format('H:i:s')]);
+
         $user->update(['status' => 0]);
     }
 
     // 休憩開始
     private function restIn($user) {
+        $now = Carbon::now();
 
+        $work = $user->work
+                    ->sortByDesc('work_on')
+                    ->first();
+        $rest = [
+            'work_id' => $work->id,
+            "began_at" => $now->format('H:i:s'),
+        ];
+        Rest::create($rest);
+        $user->update(['status' => 2]);
     }
 
     // 休憩終了
     private function restOut($user) {
+        $now = Carbon::now();
 
+        $user->work
+            ->sortByDesc('work_on')
+            ->first()
+            ->rest
+            ->sortByDesc('id')
+            ->first()
+            ->update(["finished_at" => $now->format('H:i:s')]);
+        $user->update(['status' => 1]);
     }
 }
