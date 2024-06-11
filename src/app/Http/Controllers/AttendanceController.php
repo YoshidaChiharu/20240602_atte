@@ -42,53 +42,109 @@ class AttendanceController extends Controller
     private function punchIn($user) {
         $now = Carbon::now();
 
-        $work = [
+        $param = [
             "user_id" => $user->id,
             "work_on" => $now->format('Y-m-d'),
             "began_at" => $now->format('H:i:s'),
         ];
-        Work::create($work);
+        Work::create($param);
+        // ステータス変更 [0:退勤中]->[1:勤務中]
         $user->update(['status' => '1']);
     }
 
     // 勤務終了
     private function punchOut($user) {
         $now = Carbon::now();
+        $date = $now->format('Y-m-d');
+        $time = $now->format('H:i:s');
+        $work = $user->work->sortByDesc('work_on')->first();
 
-        $user->work
-            ->sortByDesc('work_on')
-            ->first()
-            ->update(["finished_at" => $now->format('H:i:s')]);
-
+        if($work->work_on > $date) {
+            return false;
+        } elseif($work->work_on === $date) {
+            // 同日中の退勤処理
+            $work->update(["finished_at" => $time]);
+        } elseif($work->work_on < $date) {
+            // 日跨ぎ処理
+            $work->update(["finished_at" => "23:59:59"]);
+            $param = [
+                "user_id" => $user->id,
+                "work_on" => $date,
+                "began_at" => "00:00:00",
+                "finished_at" => $time,
+            ];
+            Work::create($param);
+        }
+        // ステータス変更 [1:勤務中]->[0:退勤中]
         $user->update(['status' => 0]);
     }
 
     // 休憩開始
     private function restIn($user) {
         $now = Carbon::now();
+        $date = $now->format('Y-m-d');
+        $time = $now->format('H:i:s');
+        $work = $user->work->sortByDesc('work_on')->first();
 
-        $work = $user->work
-                    ->sortByDesc('work_on')
-                    ->first();
-        $rest = [
-            'work_id' => $work->id,
-            "began_at" => $now->format('H:i:s'),
-        ];
-        Rest::create($rest);
+        if($work->work_on > $date) {
+            return false;
+        } elseif($work->work_on === $date) {
+            // 同日中の休憩開始処理
+            $param = [
+                'work_id' => $work->id,
+                "began_at" => $time,
+            ];
+            Rest::create($param);
+        } elseif($work->work_on < $date) {
+            // 日跨ぎ処理
+            $work->update(["finished_at" => "23:59:59"]);
+            $param = [
+                "user_id" => $user->id,
+                "work_on" => $date,
+                "began_at" => "00:00:00",
+            ];
+            $work_today = Work::create($param);
+            $param = [
+                'work_id' => $work_today->id,
+                "began_at" => $time,
+            ];
+            Rest::create($param);
+        }
+        // ステータス変更 [1:勤務中]->[2:休憩中]
         $user->update(['status' => 2]);
     }
 
     // 休憩終了
     private function restOut($user) {
         $now = Carbon::now();
+        $date = $now->format('Y-m-d');
+        $time = $now->format('H:i:s');
+        $work = $user->work->sortByDesc('work_on')->first();
+        $rest = $work->rest->sortByDesc('id')->first();
 
-        $user->work
-            ->sortByDesc('work_on')
-            ->first()
-            ->rest
-            ->sortByDesc('id')
-            ->first()
-            ->update(["finished_at" => $now->format('H:i:s')]);
+        if($work->work_on > $date) {
+            return false;
+        } elseif($work->work_on === $date) {
+            // 同日中の休憩終了処理
+            $rest->update(["finished_at" => $time]);
+        } elseif($work->work_on < $date) {
+            // 日跨ぎ処理
+            $rest->update(["finished_at" => "23:59:59"]);
+            $work->update(["finished_at" => "23:59:59"]);
+            $param = [
+                "user_id" => $user->id,
+                "work_on" => $date,
+                "began_at" => "00:00:00",
+            ];
+            $work_today = Work::create($param);
+            $param = [
+                'work_id' => $work_today->id,
+                "began_at" => "00:00:00",
+                "finished_at" => $time,
+            ];
+            Rest::create($param);
+        }
+        // ステータス変更 [2:休憩中]->[1:勤務中]
         $user->update(['status' => 1]);
     }
 }
