@@ -33,9 +33,7 @@ class AttendanceController extends Controller
             $this->restOut($auths);
         }
 
-        $name = $auths->name;
-        $status = $auths->status;
-        return view('punch', compact(['name', 'status']));
+        return redirect('/');
     }
 
     // 勤務開始
