@@ -1,0 +1,76 @@
+.container {
+    margin: 0 auto;
+    padding: 60px 15px;
+    max-width: 1230px;
+}
+
+.selector {
+    text-align: center;
+}
+
+.selector__prev,
+.selector__next {
+    padding: 4px 12px;
+    font-size: 20px;
+    font-weight: bold;
+    background-color: white;
+    color: #214BE0;
+    border: solid 1px #214BE0;
+    border-radius: 2px;
+}
+
+.selector__current {
+    padding: 0 20px;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.attendance-info {
+    margin-top: 60px;
+}
+
+.attendance-table {
+    width: 100%;
+}
+
+.attendance-table tr {
+    border-top: solid 1px #909090;
+}
+
+.attendance-table th,td {
+    width: 20%;
+    padding: 20px;
+    text-align: left;
+    font-weight: bold;
+}
+
+/* ページネーションのカスタマイズ */
+.pagination ul {
+    margin: 0;
+    border: solid 1px #e0dfde;
+    border-radius: 5px;
+    display: flex;
+}
+
+.pagination li {
+    padding: 5px 10px;
+}
+
+.pagination a,
+.pagination span {
+    text-decoration: none;
+    font-size: 14px;
+    color: #214BE0;
+}
+
+.pagination li:not(:last-child) {
+    border-right: solid 1px #e0dfde;
+}
+
+.pagination .active {
+    background-color: #214BE0;
+}
+
+.pagination .active span {
+    color: white;
+}

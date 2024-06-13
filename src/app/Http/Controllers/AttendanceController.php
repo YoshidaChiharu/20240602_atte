@@ -36,6 +36,11 @@ class AttendanceController extends Controller
         return redirect('/');
     }
 
+    // 日付別勤怠ページ表示
+    public function attendance() {
+        return view('attendance');
+    }
+
     // 勤務開始
     private function punchIn($user) {
         $now = Carbon::now();
