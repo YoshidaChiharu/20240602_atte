@@ -25,11 +25,11 @@ class AttendanceController extends Controller
 
         if ($request->has('punch_in')) {
             $this->punchIn($auths);
-        }elseif ($request->has('punch_out')) {
+        } elseif ($request->has('punch_out')) {
             $this->punchOut($auths);
-        }elseif ($request->has('rest_in')) {
+        } elseif ($request->has('rest_in')) {
             $this->restIn($auths);
-        }elseif ($request->has('rest_out')) {
+        } elseif ($request->has('rest_out')) {
             $this->restOut($auths);
         }
 
@@ -37,8 +37,16 @@ class AttendanceController extends Controller
     }
 
     // 日付別勤怠ページ表示
-    public function attendance() {
-        return view('attendance');
+    public function attendance(Request $request) {
+        if ($request->has('current')) {
+            // 
+        } else {
+            $date = '2024-06-13';
+            // $date = Carbon::now()->format('Y-m-d');
+            $works = Work::where('work_on', $date)->paginate(5);
+            $works->last()->workTime();
+        }
+        return view('attendance', compact(['date', 'works']));
     }
 
     // 勤務開始

@@ -8,9 +8,9 @@
 <div class="container">
     <div class="selector">
         <form action="/attendance" method="get">
-            <input type="hidden" value="2024-06-13">
+            <input type="hidden" value="{{ $date }}" name="current">
             <button class="selector__prev" name="prev"><</button>
-            <span class="selector__current">2024-06-13</span>
+            <span class="selector__current">{{ $date }}</span>
             <button class="selector__next" name="next">></button>
         </form>
     </div>
@@ -23,7 +23,16 @@
                 <th>休憩時間</th>
                 <th>勤務時間</th>
             </tr>
+            @foreach($works as $work)
             <tr>
+                <td>{{ $work->user->name }}</td>
+                <td>{{ $work->began_at }}</td>
+                <td>{{ $work->finished_at }}</td>
+                <td>{{ $work->restTime() }}</td>
+                <td>{{ $work->workTime() }}</td>
+            </tr>
+            @endforeach
+            <!-- <tr>
                 <td>テスト太郎</td>
                 <td>10:00:00</td>
                 <td>20:00:00</td>
@@ -57,10 +66,11 @@
                 <td>20:00:00</td>
                 <td>00:30:00</td>
                 <td>09:30:00</td>
-            </tr>
+            </tr> -->
         </table>
     </div>
     <div class="pagination">
+        {{ $works->appends(request()->query())->links('vendor.pagination.default') }}
     </div>
 </div>
 @endsection
