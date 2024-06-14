@@ -7,7 +7,8 @@
 @section('content')
 <div class="container">
     <div class="selector">
-        <form action="/attendance" method="get">
+        <form action="/attendance" method="post">
+            @csrf
             <input type="hidden" value="{{ $date }}" name="current">
             <button class="selector__prev" name="prev"><</button>
             <span class="selector__current">{{ $date }}</span>
@@ -32,41 +33,6 @@
                 <td>{{ $work->workTime() }}</td>
             </tr>
             @endforeach
-            <!-- <tr>
-                <td>テスト太郎</td>
-                <td>10:00:00</td>
-                <td>20:00:00</td>
-                <td>00:30:00</td>
-                <td>09:30:00</td>
-            </tr>
-            <tr>
-                <td>テスト太郎</td>
-                <td>10:00:00</td>
-                <td>20:00:00</td>
-                <td>00:30:00</td>
-                <td>09:30:00</td>
-            </tr>
-            <tr>
-                <td>テスト太郎</td>
-                <td>10:00:00</td>
-                <td>20:00:00</td>
-                <td>00:30:00</td>
-                <td>09:30:00</td>
-            </tr>
-            <tr>
-                <td>テスト太郎</td>
-                <td>10:00:00</td>
-                <td>20:00:00</td>
-                <td>00:30:00</td>
-                <td>09:30:00</td>
-            </tr>
-            <tr>
-                <td>テスト太郎</td>
-                <td>10:00:00</td>
-                <td>20:00:00</td>
-                <td>00:30:00</td>
-                <td>09:30:00</td>
-            </tr> -->
         </table>
     </div>
     <div class="pagination">

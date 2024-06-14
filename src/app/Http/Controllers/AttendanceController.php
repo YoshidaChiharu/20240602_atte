@@ -37,19 +37,28 @@ class AttendanceController extends Controller
     }
 
     // 日付別勤怠ページ表示
-    public function attendance(Request $request) {
-        if ($request->has('current')) {
-            // 
-        } else {
-            $date = '2024-06-13';
-            // $date = Carbon::now()->format('Y-m-d');
-            $works = Work::where('work_on', $date)->paginate(5);
-            $works->last()->workTime();
+    public function showDaily(Request $request) {
+        $date = $request->date;
+        if (empty($date)) {
+            $date = Carbon::now()->format('Y-m-d');
         }
+        $works = Work::where('work_on', $date)->paginate(5);
+
         return view('attendance', compact(['date', 'works']));
     }
 
-    // 勤務開始
+    // 日付別勤怠ページ：日付前後操作
+    public function changeDay(Request $request) {
+        $date = new Carbon($request->current);
+        if ($request->has('prev')) {
+            $date = $date->subDays(1)->format('Y-m-d');
+        } elseif ($request->has('next')) {
+            $date = $date->addDays(1)->format('Y-m-d');
+        }
+        return redirect()->route('show.daily', compact('date'));
+    }
+
+    // 勤務開始メソッド
     private function punchIn($user) {
         $now = Carbon::now();
 
@@ -63,7 +72,7 @@ class AttendanceController extends Controller
         $user->update(['status' => '1']);
     }
 
-    // 勤務終了
+    // 勤務終了メソッド
     private function punchOut($user) {
         $now = Carbon::now();
         $date = $now->format('Y-m-d');
@@ -90,7 +99,7 @@ class AttendanceController extends Controller
         $user->update(['status' => 0]);
     }
 
-    // 休憩開始
+    // 休憩開始メソッド
     private function restIn($user) {
         $now = Carbon::now();
         $date = $now->format('Y-m-d');
@@ -125,7 +134,7 @@ class AttendanceController extends Controller
         $user->update(['status' => 2]);
     }
 
-    // 休憩終了
+    // 休憩終了メソッド
     private function restOut($user) {
         $now = Carbon::now();
         $date = $now->format('Y-m-d');
