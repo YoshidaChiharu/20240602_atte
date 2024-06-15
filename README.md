@@ -75,7 +75,7 @@ php artisan db:seed
 
 ## ER図
 
-![er-atte](/er-atte.png)
+![er_atte](/er_atte.png)
 
 ## URL
 
