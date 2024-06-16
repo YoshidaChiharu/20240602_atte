@@ -58,6 +58,10 @@ class AttendanceController extends Controller
         return redirect()->route('show.daily', compact('date'));
     }
 
+    public function showUserList() {
+        return view('user_list');
+    }
+
     // 勤務開始メソッド
     private function punchIn($user) {
         $now = Carbon::now();

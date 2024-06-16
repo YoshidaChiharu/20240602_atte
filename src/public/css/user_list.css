@@ -1,0 +1,77 @@
+.container {
+    margin: 0 auto;
+    padding: 60px 15px;
+    max-width: 800px;
+}
+
+.user-list {
+    margin-top: 60px;
+}
+
+.user-list__table {
+    width: 100%;
+    border-bottom: solid 1px #909090;
+}
+
+.user-list__table tr {
+    border-top: solid 1px #909090;
+}
+
+.user-list__table th,
+.user-list__table td {
+    padding: 20px;
+    text-align: left;
+    font-weight: bold;
+}
+
+.table__column-no {
+    width: 10%;
+}
+
+.table__column-name {
+    width: 30%;
+}
+
+.table__column-datetime {
+    width: 60%;
+}
+
+/* ページネーションのカスタマイズ */
+.user-list__pagination {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.user-list__pagination nav {
+    display: inline-block;
+}
+
+.user-list__pagination ul {
+    margin: 0;
+    border: solid 1px #e0dfde;
+    border-radius: 5px;
+    background-color: white;
+    display: flex;
+}
+
+.user-list__pagination a,
+.user-list__pagination span {
+    padding: 10px 15px;
+    text-decoration: none;
+    font-size: 16px;
+    color: #214BE0;
+    display: inline-block;
+    cursor: pointer;
+}
+
+.user-list__pagination li:not(:last-child) {
+    border-right: solid 1px #e0dfde;
+}
+
+.user-list__pagination .active {
+    background-color: #214BE0;
+}
+
+.user-list__pagination .active span {
+    color: white;
+}

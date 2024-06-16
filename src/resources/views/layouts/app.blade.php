@@ -24,6 +24,9 @@
                             <a class="header__nav-item" href="/">ホーム</a>
                         </li>
                         <li>
+                            <a class="header__nav-item" href="/user_list">ユーザー一覧</a>
+                        </li>
+                        <li>
                             <a class="header__nav-item" href="/attendance">日付一覧</a>
                         </li>
                         <li>

@@ -19,4 +19,5 @@ Route::middleware('auth')->group(function () {
     Route::post('/', [AttendanceController::class, 'punch']);
     Route::get('/attendance', [AttendanceController::class, 'showDaily'])->name('show.daily');
     Route::post('/attendance', [AttendanceController::class, 'changeDay']);
+    Route::get('/user_list', [AttendanceController::class, 'showUserList']);
 });
