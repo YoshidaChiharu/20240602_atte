@@ -58,8 +58,28 @@ class AttendanceController extends Controller
         return redirect()->route('show.daily', compact('date'));
     }
 
+    // ユーザー一覧ページ表示
     public function showUserList() {
-        return view('user_list');
+        $users = User::all();
+        foreach($users as $user) {
+            $work = $user->work->sortByDesc('work_on')->first();
+            if(empty($work)){
+                $last_work = '-';
+            } else {
+                $last_work = "{$work->work_on} {$work->began_at}";
+            }
+
+            $user_list[] = [
+                'name' => $user->name,
+                'last_work' => $last_work,
+            ];
+        }
+        array_multisort(array_column($user_list, 'last_work'), SORT_DESC, $user_list);
+        for($i = 0; $i < count($user_list); $i++) {
+            $user_list[$i]['no'] = $i+1;
+        }
+
+        return view('user_list', compact('user_list'));
     }
 
     // 勤務開始メソッド
