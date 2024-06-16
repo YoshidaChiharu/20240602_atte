@@ -17,6 +17,7 @@
     color: #214BE0;
     border: solid 1px #214BE0;
     border-radius: 2px;
+    cursor: pointer;
 }
 
 .selector__current {
@@ -46,6 +47,7 @@
 
 /* ページネーションのカスタマイズ */
 .pagination {
+    margin-top: 20px;
     text-align: center;
 }
 
@@ -61,15 +63,14 @@
     display: flex;
 }
 
-.pagination li {
-    padding: 10px 15px;
-}
-
 .pagination a,
 .pagination span {
+    padding: 10px 15px;
     text-decoration: none;
     font-size: 16px;
     color: #214BE0;
+    display: inline-block;
+    cursor: pointer;
 }
 
 .pagination li:not(:last-child) {
