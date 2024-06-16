@@ -8,6 +8,7 @@ use App\Models\Work;
 use App\Models\Rest;
 use Auth;
 use Carbon\Carbon;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class AttendanceController extends Controller
 {
@@ -59,7 +60,7 @@ class AttendanceController extends Controller
     }
 
     // ユーザー一覧ページ表示
-    public function showUserList() {
+    public function showUserList(Request $request) {
         $users = User::all();
         foreach($users as $user) {
             $work = $user->work->sortByDesc('work_on')->first();
@@ -70,6 +71,7 @@ class AttendanceController extends Controller
             }
 
             $user_list[] = [
+                'id' => $user->id,
                 'name' => $user->name,
                 'last_work' => $last_work,
             ];
@@ -78,6 +80,18 @@ class AttendanceController extends Controller
         for($i = 0; $i < count($user_list); $i++) {
             $user_list[$i]['no'] = $i+1;
         }
+
+        // ページネーション
+        $perPage = 20;
+        $user_list = collect($user_list);
+        $user_list = new LengthAwarePaginator(
+            $user_list->forPage($request->page, $perPage),
+            $user_list->count(),
+            $perPage,
+            $request->page,
+            ['path' => $request->url()],
+        );
+        // dd($user_list);
 
         return view('user_list', compact('user_list'));
     }
