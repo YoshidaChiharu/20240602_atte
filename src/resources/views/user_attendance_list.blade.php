@@ -6,6 +6,7 @@
 
 @section('content')
 <div class="container">
+    <div class="heading">nameさんの出勤簿</div>
     <div class="selector">
         <form action="/user_attendance_list" method="post">
             @csrf
