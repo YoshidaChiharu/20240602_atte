@@ -20,4 +20,5 @@ Route::middleware('auth')->group(function () {
     Route::get('/attendance', [AttendanceController::class, 'showDaily'])->name('show.daily');
     Route::post('/attendance', [AttendanceController::class, 'changeDay']);
     Route::get('/user_list', [AttendanceController::class, 'showUserList']);
+    Route::get('/user_attendance_list/{id}', [AttendanceController::class, 'showUserAttendanceList']);
 });

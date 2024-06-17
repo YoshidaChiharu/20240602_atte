@@ -96,6 +96,11 @@ class AttendanceController extends Controller
         return view('user_list', compact('user_list'));
     }
 
+    // ユーザー別勤怠ページ表示
+    public function showUserAttendanceList($id) {
+        return view('user_attendance_list');
+    }
+
     // 勤務開始メソッド
     private function punchIn($user) {
         $now = Carbon::now();

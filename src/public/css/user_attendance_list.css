@@ -1,0 +1,80 @@
+.container {
+    margin: 0 auto;
+    padding: 60px 15px;
+    max-width: 1230px;
+}
+
+.selector {
+    text-align: center;
+    position: relative;
+}
+
+.selector-center button {
+    padding: 4px 12px;
+    font-size: 20px;
+    font-weight: bold;
+    background-color: white;
+    color: #214BE0;
+    border: solid 1px #214BE0;
+    border-radius: 2px;
+    cursor: pointer;
+}
+
+.selector-center span {
+    padding: 0 20px;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.selector-right {
+    position: absolute;
+    top: 50%;
+    right: 0;
+    transform: translateY(-50%);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.selector-right span {
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.selector-right input {
+    padding: 3px 10px;
+    font-size: 16px;
+    border: solid 1px #909090;
+    border-radius: 2px;
+}
+
+.selector-right button {
+    padding: 3px 10px;
+    font-weight: bold;
+    color: #214BE0;
+    background-color: white;
+    border: solid 1px #214BE0;
+    border-radius: 2px;
+    cursor: pointer;
+}
+
+.attendance-info {
+    margin-top: 60px;
+}
+
+.attendance-table {
+    width: 100%;
+    border-bottom: solid 1px #909090;
+}
+
+.attendance-table tr {
+    border-top: solid 1px #909090;
+}
+
+.attendance-table th,
+td {
+    width: 20%;
+    padding: 20px;
+    text-align: left;
+    font-weight: bold;
+}

@@ -16,7 +16,9 @@
             @foreach($user_list as $user)
             <tr>
                 <td class="table__column-no">{{ $user['no'] }}</td>
-                <td class="table__column-name">{{ $user['name'] }}</td>
+                <td class="table__column-name">
+                    <a href="/user_attendance_list/{{ $user['id'] }}">{{ $user['name'] }}</a>
+                </td>
                 <td class="table__column-datetime">{{ $user['last_work'] }}</td>
             </tr>
             @endforeach
