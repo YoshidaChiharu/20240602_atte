@@ -5,6 +5,7 @@ namespace Database\Factories;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Carbon\Carbon;
 use DateTime;
+use App\Models\User;
 
 class WorkFactory extends Factory
 {
@@ -23,7 +24,7 @@ class WorkFactory extends Factory
                     ->format('H:i:s');
 
         return [
-            'user_id' => $this->faker->unique()->numberBetween(1, 100),
+            'user_id' => $this->faker->unique()->numberBetween(1, User::count()),
             'work_on' => Carbon::now()->format('Y-m-d'),
             'began_at' => $began_at,
             'finished_at' => $finished_at,

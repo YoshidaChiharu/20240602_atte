@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
+use App\Models\User;
 
 class DatabaseSeeder extends Seeder
 {
@@ -13,7 +14,9 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
-        \App\Models\User::factory(100)->create();
+        if (User::count() < 100) {
+            \App\Models\User::factory(100)->create();
+        }
         \App\Models\Work::factory(80)->create();
         \App\Models\Rest::factory(80)->create();
     }

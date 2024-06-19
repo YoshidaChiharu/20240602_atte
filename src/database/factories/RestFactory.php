@@ -5,6 +5,7 @@ namespace Database\Factories;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use DateTime;
 use DateInterval;
+use App\Models\Work;
 
 class RestFactory extends Factory
 {
@@ -22,7 +23,7 @@ class RestFactory extends Factory
                     ->format('H:i:s');
 
         return [
-            'work_id' => $this->faker->numberBetween(1, 80),
+            'work_id' => $this->faker->numberBetween(1, Work::count()),
             'began_at' => $began_at,
             'finished_at' => $finished_at,
         ];
