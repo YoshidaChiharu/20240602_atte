@@ -46,4 +46,15 @@ class User extends Authenticatable
     public function work() {
         return $this->hasMany('App\Models\Work');
     }
+
+    // 指定した年月の勤怠情報のみを取得
+    public function getMonthlyWorks($year, $month) {
+        $works = $this->work
+                    ->filter(function ($work) use ($year, $month) {
+                        return strpos($work['work_on'], $year.'-'.$month) !== false;
+                    })
+                    ->sortBy('work_on');
+
+        return $works;
+    }
 }

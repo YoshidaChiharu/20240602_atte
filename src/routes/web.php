@@ -17,8 +17,9 @@ use App\Http\Controllers\AttendanceController;
 Route::middleware('auth')->group(function () {
     Route::get('/', [AttendanceController::class, 'index']);
     Route::post('/', [AttendanceController::class, 'punch']);
-    Route::get('/attendance', [AttendanceController::class, 'showDaily'])->name('show.daily');
+    Route::get('/attendance', [AttendanceController::class, 'showDaily'])->name('get.attendance');
     Route::post('/attendance', [AttendanceController::class, 'changeDay']);
     Route::get('/user_list', [AttendanceController::class, 'showUserList']);
-    Route::get('/user_attendance_list/{id}', [AttendanceController::class, 'showUserAttendanceList']);
+    Route::get('/user_attendance_list/{user_id}', [AttendanceController::class, 'showUserAttendanceList'])->name('get.user_attendance_list');
+    Route::post('/user_attendance_list/{user_id}', [AttendanceController::class, 'changeYearMonth']);
 });

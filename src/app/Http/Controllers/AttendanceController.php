@@ -12,7 +12,7 @@ use Illuminate\Pagination\LengthAwarePaginator;
 
 class AttendanceController extends Controller
 {
-    // 打刻ページ表示
+    // 打刻ページ表示 ==================================================
     public function index() {
         $auths = Auth::user();
         $name = $auths->name;
@@ -20,7 +20,7 @@ class AttendanceController extends Controller
         return view('punch', compact(['name', 'status']));
     }
 
-    // 打刻処理
+    // 打刻ページ：打刻処理 ============================================
     public function punch(Request $request) {
         $auths = Auth::user();
 
@@ -37,10 +37,11 @@ class AttendanceController extends Controller
         return redirect('/');
     }
 
-    // 日付別勤怠ページ表示
+    // 日付別勤怠ページ表示 ============================================
     public function showDaily(Request $request) {
-        $date = $request->date;
-        if (empty($date)) {
+        if ($request->has('date')) {
+            $date = $request->date;
+        } else {
             $date = Carbon::now()->format('Y-m-d');
         }
         $works = Work::where('work_on', $date)->paginate(5);
@@ -48,7 +49,7 @@ class AttendanceController extends Controller
         return view('attendance', compact(['date', 'works']));
     }
 
-    // 日付別勤怠ページ：日付前後操作
+    // 日付別勤怠ページ：日付変更操作 ==================================
     public function changeDay(Request $request) {
         $date = new Carbon($request->current);
         if ($request->has('prev')) {
@@ -56,10 +57,10 @@ class AttendanceController extends Controller
         } elseif ($request->has('next')) {
             $date = $date->addDays(1)->format('Y-m-d');
         }
-        return redirect()->route('show.daily', compact('date'));
+        return redirect()->route('get.attendance', compact('date'));
     }
 
-    // ユーザー一覧ページ表示
+    // ユーザー一覧ページ表示 ==========================================
     public function showUserList(Request $request) {
         $users = User::all();
         foreach($users as $user) {
@@ -91,17 +92,69 @@ class AttendanceController extends Controller
             $request->page,
             ['path' => $request->url()],
         );
-        // dd($user_list);
 
         return view('user_list', compact('user_list'));
     }
 
-    // ユーザー別勤怠ページ表示
-    public function showUserAttendanceList($id) {
-        return view('user_attendance_list');
+    // ユーザー別勤怠ページ表示 ========================================
+    public function showUserAttendanceList(Request $request, $user_id) {
+        if ($request->has('year_month')) {
+            $carbon = new Carbon($request->year_month);
+        } else {
+            $carbon = Carbon::now();
+        }
+        $year = $carbon->format('Y');
+        $month = $carbon->format('m');
+
+        $user = User::find($user_id);
+        $user_name = $user->name;
+        $monthly_works = $user->getMonthlyWorks($year, $month);
+        $last_day = (new Carbon("{$year}-{$month}"))->endOfMonth()->format('d');
+
+        for ($day = 1, $i = 0; $day <= $last_day; $day++) {
+            $day = sprintf('%02d', $day);
+            if ($monthly_works->isNotEmpty() &&
+                $monthly_works[$i]->work_on === "{$year}-{$month}-{$day}") {
+                $works[] = [
+                    'date' => "{$month}/{$day}",
+                    'began_at' => $monthly_works[$i]->began_at,
+                    'finished_at' => $monthly_works[$i]->finished_at,
+                    'rest_time' => $monthly_works[$i]->restTime(),
+                    'work_time' => $monthly_works[$i]->workTime(),
+                ];
+                if($i < ($monthly_works->count() - 1)) { $i++; }
+            } else {
+                $works[] = [
+                    'date' => "{$month}/{$day}",
+                    'began_at' => '-',
+                    'finished_at' => '-',
+                    'rest_time' => '-',
+                    'work_time' => '-',
+                ];
+            }
+        }
+
+        return view(
+            'user_attendance_list',
+            compact(['user_id', 'user_name', 'year', 'month', 'works']),
+        );
     }
 
-    // 勤務開始メソッド
+    // ユーザー別勤怠ページ：年月変更操作 ================================
+    public function changeYearMonth(Request $request, $user_id) {
+        if ($request->has('prev')) {
+            $year_month = (new Carbon($request->current))->subMonth();
+        } elseif ($request->has('next')) {
+            $year_month = (new Carbon($request->current))->addMonth();
+        } elseif ($request->has('specify')) {
+            $year_month = new Carbon($request->specific_month);
+        }
+        $year_month = $year_month->format('Y-m');
+
+        return redirect()->route('get.user_attendance_list', compact('user_id', 'year_month'));
+    }
+
+    // 勤務開始メソッド ================================================
     private function punchIn($user) {
         $now = Carbon::now();
 
@@ -115,7 +168,7 @@ class AttendanceController extends Controller
         $user->update(['status' => '1']);
     }
 
-    // 勤務終了メソッド
+    // 勤務終了メソッド ================================================
     private function punchOut($user) {
         $now = Carbon::now();
         $date = $now->format('Y-m-d');
@@ -142,7 +195,7 @@ class AttendanceController extends Controller
         $user->update(['status' => 0]);
     }
 
-    // 休憩開始メソッド
+    // 休憩開始メソッド ================================================
     private function restIn($user) {
         $now = Carbon::now();
         $date = $now->format('Y-m-d');
@@ -177,7 +230,7 @@ class AttendanceController extends Controller
         $user->update(['status' => 2]);
     }
 
-    // 休憩終了メソッド
+    // 休憩終了メソッド=================================================
     private function restOut($user) {
         $now = Carbon::now();
         $date = $now->format('Y-m-d');
