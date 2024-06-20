@@ -11,6 +11,13 @@
     font-weight: bold;
 }
 
+.message {
+    margin-bottom: 20px;
+    text-align: center;
+    color: red;
+    font-weight: bold;
+}
+
 .punch-form {
     display: flex;
     justify-content: center;

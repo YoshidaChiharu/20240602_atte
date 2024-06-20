@@ -13,7 +13,7 @@ use Illuminate\Pagination\LengthAwarePaginator;
 class AttendanceController extends Controller
 {
     // 打刻ページ表示 ==================================================
-    public function index() {
+    public function index(Request $request) {
         $auths = Auth::user();
         $name = $auths->name;
         $status = $auths->status;
@@ -25,16 +25,31 @@ class AttendanceController extends Controller
         $auths = Auth::user();
 
         if ($request->has('punch_in')) {
-            $this->punchIn($auths);
+            $result = $this->punchIn($auths);
         } elseif ($request->has('punch_out')) {
-            $this->punchOut($auths);
+            $result = $this->punchOut($auths);
         } elseif ($request->has('rest_in')) {
-            $this->restIn($auths);
+            $result = $this->restIn($auths);
         } elseif ($request->has('rest_out')) {
-            $this->restOut($auths);
+            $result = $this->restOut($auths);
         }
 
-        return redirect('/');
+        // 例外処理エラーメッセージ
+        switch ($result) {
+            case null:
+                $message = null;
+                break;
+            case 1062:
+                $message = "打刻エラー：本日は既に出勤済みです";
+                break;
+            case false:
+                $message = "打刻エラー";
+                break;
+            default:
+                $message = "エラーが発生しました";
+        }
+
+        return redirect('/')->with('message', $message);
     }
 
     // 日付別勤怠ページ表示 ============================================
@@ -163,9 +178,14 @@ class AttendanceController extends Controller
             "work_on" => $now->format('Y-m-d'),
             "began_at" => $now->format('H:i:s'),
         ];
-        Work::create($param);
-        // ステータス変更 [0:退勤中]->[1:勤務中]
-        $user->update(['status' => '1']);
+        try {
+            Work::create($param);
+            // ステータス変更 [0:退勤中]->[1:勤務中]
+            $user->update(['status' => '1']);
+        }
+        catch (\Exception $e) {
+            return $e->errorInfo[1];
+        }
     }
 
     // 勤務終了メソッド ================================================
@@ -173,26 +193,31 @@ class AttendanceController extends Controller
         $now = Carbon::now();
         $date = $now->format('Y-m-d');
         $time = $now->format('H:i:s');
-        $work = $user->work->sortByDesc('work_on')->first();
 
-        if($work->work_on > $date) {
-            return false;
-        } elseif($work->work_on === $date) {
-            // 同日中の退勤処理
-            $work->update(["finished_at" => $time]);
-        } elseif($work->work_on < $date) {
-            // 日跨ぎ処理
-            $work->update(["finished_at" => "23:59:59"]);
-            $param = [
-                "user_id" => $user->id,
-                "work_on" => $date,
-                "began_at" => "00:00:00",
-                "finished_at" => $time,
-            ];
-            Work::create($param);
+        try {
+            $work = $user->work->sortByDesc('work_on')->first();
+            if($work->work_on > $date) {
+                return 9999;
+            } elseif($work->work_on === $date) {
+                // 同日中の退勤処理
+                $work->update(["finished_at" => $time]);
+            } elseif($work->work_on < $date) {
+                // 日跨ぎ処理
+                $work->update(["finished_at" => "23:59:59"]);
+                $param = [
+                    "user_id" => $user->id,
+                    "work_on" => $date,
+                    "began_at" => "00:00:00",
+                    "finished_at" => $time,
+                ];
+                Work::create($param);
+            }
+            // ステータス変更 [1:勤務中]->[0:退勤中]
+            $user->update(['status' => 0]);
         }
-        // ステータス変更 [1:勤務中]->[0:退勤中]
-        $user->update(['status' => 0]);
+        catch (\Exception $e) {
+            return $e->errorInfo[1];
+        }
     }
 
     // 休憩開始メソッド ================================================
@@ -200,34 +225,39 @@ class AttendanceController extends Controller
         $now = Carbon::now();
         $date = $now->format('Y-m-d');
         $time = $now->format('H:i:s');
-        $work = $user->work->sortByDesc('work_on')->first();
 
-        if($work->work_on > $date) {
-            return false;
-        } elseif($work->work_on === $date) {
-            // 同日中の休憩開始処理
-            $param = [
-                'work_id' => $work->id,
-                "began_at" => $time,
-            ];
-            Rest::create($param);
-        } elseif($work->work_on < $date) {
-            // 日跨ぎ処理
-            $work->update(["finished_at" => "23:59:59"]);
-            $param = [
-                "user_id" => $user->id,
-                "work_on" => $date,
-                "began_at" => "00:00:00",
-            ];
-            $work_today = Work::create($param);
-            $param = [
-                'work_id' => $work_today->id,
-                "began_at" => $time,
-            ];
-            Rest::create($param);
+        try {
+            $work = $user->work->sortByDesc('work_on')->first();
+            if($work->work_on > $date) {
+                return 9999;
+            } elseif($work->work_on === $date) {
+                // 同日中の休憩開始処理
+                $param = [
+                    'work_id' => $work->id,
+                    "began_at" => $time,
+                ];
+                Rest::create($param);
+            } elseif($work->work_on < $date) {
+                // 日跨ぎ処理
+                $work->update(["finished_at" => "23:59:59"]);
+                $param = [
+                    "user_id" => $user->id,
+                    "work_on" => $date,
+                    "began_at" => "00:00:00",
+                ];
+                $work_today = Work::create($param);
+                $param = [
+                    'work_id' => $work_today->id,
+                    "began_at" => $time,
+                ];
+                Rest::create($param);
+            }
+            // ステータス変更 [1:勤務中]->[2:休憩中]
+            $user->update(['status' => 2]);
         }
-        // ステータス変更 [1:勤務中]->[2:休憩中]
-        $user->update(['status' => 2]);
+        catch (\Exception $e) {
+            return $e->errorInfo[1];
+        }
     }
 
     // 休憩終了メソッド=================================================
@@ -235,32 +265,37 @@ class AttendanceController extends Controller
         $now = Carbon::now();
         $date = $now->format('Y-m-d');
         $time = $now->format('H:i:s');
-        $work = $user->work->sortByDesc('work_on')->first();
-        $rest = $work->rest->sortByDesc('id')->first();
 
-        if($work->work_on > $date) {
-            return false;
-        } elseif($work->work_on === $date) {
-            // 同日中の休憩終了処理
-            $rest->update(["finished_at" => $time]);
-        } elseif($work->work_on < $date) {
-            // 日跨ぎ処理
-            $rest->update(["finished_at" => "23:59:59"]);
-            $work->update(["finished_at" => "23:59:59"]);
-            $param = [
-                "user_id" => $user->id,
-                "work_on" => $date,
-                "began_at" => "00:00:00",
-            ];
-            $work_today = Work::create($param);
-            $param = [
-                'work_id' => $work_today->id,
-                "began_at" => "00:00:00",
-                "finished_at" => $time,
-            ];
-            Rest::create($param);
+        try {
+            $work = $user->work->sortByDesc('work_on')->first();
+            $rest = $work->rest->sortByDesc('id')->first();
+            if($work->work_on > $date) {
+                return 9999;
+            } elseif($work->work_on === $date) {
+                // 同日中の休憩終了処理
+                $rest->update(["finished_at" => $time]);
+            } elseif($work->work_on < $date) {
+                // 日跨ぎ処理
+                $rest->update(["finished_at" => "23:59:59"]);
+                $work->update(["finished_at" => "23:59:59"]);
+                $param = [
+                    "user_id" => $user->id,
+                    "work_on" => $date,
+                    "began_at" => "00:00:00",
+                ];
+                $work_today = Work::create($param);
+                $param = [
+                    'work_id' => $work_today->id,
+                    "began_at" => "00:00:00",
+                    "finished_at" => $time,
+                ];
+                Rest::create($param);
+            }
+            // ステータス変更 [2:休憩中]->[1:勤務中]
+            $user->update(['status' => 1]);
         }
-        // ステータス変更 [2:休憩中]->[1:勤務中]
-        $user->update(['status' => 1]);
+        catch (\Exception $e) {
+            return $e->errorInfo[1];
+        }
     }
 }

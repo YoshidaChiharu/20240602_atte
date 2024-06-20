@@ -8,6 +8,9 @@
 <div class="container">
     <div class="container__heading">{{$name}}さんお疲れ様です！</div>
     <div class="container__content">
+        <div class="message">
+            {{ session('message') }}
+        </div>
         <form action="/" class="punch-form" method="post">
             @csrf
             <input type="submit" class="form__input" name="punch_in" value="勤務開始" {{ $status == 0 ? '' : 'disabled' }}>
