@@ -9,6 +9,7 @@ use App\Models\Rest;
 use Auth;
 use Carbon\Carbon;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Lang;
 
 class AttendanceController extends Controller
 {
@@ -26,27 +27,28 @@ class AttendanceController extends Controller
 
         if ($request->has('punch_in')) {
             $result = $this->punchIn($auths);
-        } elseif ($request->has('punch_out')) {
+        } 
+        if ($request->has('punch_out')) {
             $result = $this->punchOut($auths);
-        } elseif ($request->has('rest_in')) {
+        } 
+        if ($request->has('rest_in')) {
             $result = $this->restIn($auths);
-        } elseif ($request->has('rest_out')) {
+        } 
+        if ($request->has('rest_out')) {
             $result = $this->restOut($auths);
         }
-
+        
         // 例外処理エラーメッセージ
-        switch ($result) {
-            case null:
-                $message = null;
-                break;
-            case 1062:
-                $message = "打刻エラー：本日は既に出勤済みです";
-                break;
-            case false:
-                $message = "打刻エラー";
-                break;
-            default:
-                $message = "エラーが発生しました";
+        if ($result['result']) {
+            $message = null;
+        } else {
+            switch ($result['error_code']) {
+                case 1062:
+                    $message = Lang::get('message.ERR_DOUBLE_STAMP');
+                    break;
+                default:
+                    $message = Lang::get('message.ERR_UNKNOWN');
+            }
         }
 
         return redirect('/')->with('message', $message);
@@ -182,9 +184,13 @@ class AttendanceController extends Controller
             Work::create($param);
             // ステータス変更 [0:退勤中]->[1:勤務中]
             $user->update(['status' => '1']);
+            return ['result' => true];
         }
         catch (\Exception $e) {
-            return $e->errorInfo[1];
+            return [
+                'result' => false,
+                'error_code' => $e->errorInfo[1],
+            ];
         }
     }
 
@@ -196,12 +202,14 @@ class AttendanceController extends Controller
 
         try {
             $work = $user->work->sortByDesc('work_on')->first();
-            if($work->work_on > $date) {
-                return 9999;
-            } elseif($work->work_on === $date) {
+            if($date === $work->work_on) {
                 // 同日中の退勤処理
                 $work->update(["finished_at" => $time]);
-            } elseif($work->work_on < $date) {
+                // ステータス変更 [1:勤務中]->[0:退勤中]
+                $user->update(['status' => 0]);
+                return ['result' => true];
+            }
+            if($date > $work->work_on) {
                 // 日跨ぎ処理
                 $work->update(["finished_at" => "23:59:59"]);
                 $param = [
@@ -211,12 +219,20 @@ class AttendanceController extends Controller
                     "finished_at" => $time,
                 ];
                 Work::create($param);
+                // ステータス変更 [1:勤務中]->[0:退勤中]
+                $user->update(['status' => 0]);
+                return ['result' => true];
             }
-            // ステータス変更 [1:勤務中]->[0:退勤中]
-            $user->update(['status' => 0]);
+            if($date < $work->work_on) {
+                // 予期せぬエラー
+                return ['result' => false];
+            }
         }
         catch (\Exception $e) {
-            return $e->errorInfo[1];
+            return [
+                'result' => false,
+                'error_code' => $e->errorInfo[1],
+            ];
         }
     }
 
@@ -228,16 +244,18 @@ class AttendanceController extends Controller
 
         try {
             $work = $user->work->sortByDesc('work_on')->first();
-            if($work->work_on > $date) {
-                return 9999;
-            } elseif($work->work_on === $date) {
+            if($date === $work->work_on) {
                 // 同日中の休憩開始処理
                 $param = [
                     'work_id' => $work->id,
                     "began_at" => $time,
                 ];
                 Rest::create($param);
-            } elseif($work->work_on < $date) {
+                // ステータス変更 [1:勤務中]->[2:休憩中]
+                $user->update(['status' => 2]);
+                return ['result' => true];
+            }
+            if($date > $work->work_on) {
                 // 日跨ぎ処理
                 $work->update(["finished_at" => "23:59:59"]);
                 $param = [
@@ -251,12 +269,20 @@ class AttendanceController extends Controller
                     "began_at" => $time,
                 ];
                 Rest::create($param);
+                // ステータス変更 [1:勤務中]->[2:休憩中]
+                $user->update(['status' => 2]);
+                return ['result' => true];
             }
-            // ステータス変更 [1:勤務中]->[2:休憩中]
-            $user->update(['status' => 2]);
+            if($date < $work->work_on) {
+                // 予期せぬエラー
+                return ['result' => false];
+            }
         }
         catch (\Exception $e) {
-            return $e->errorInfo[1];
+            return [
+                'result' => false,
+                'error_code' => $e->errorInfo[1],
+            ];
         }
     }
 
@@ -269,12 +295,14 @@ class AttendanceController extends Controller
         try {
             $work = $user->work->sortByDesc('work_on')->first();
             $rest = $work->rest->sortByDesc('id')->first();
-            if($work->work_on > $date) {
-                return 9999;
-            } elseif($work->work_on === $date) {
+            if($date === $work->work_on) {
                 // 同日中の休憩終了処理
                 $rest->update(["finished_at" => $time]);
-            } elseif($work->work_on < $date) {
+                // ステータス変更 [2:休憩中]->[1:勤務中]
+                $user->update(['status' => 1]);
+                return ['result' => true];
+            }
+            if($date > $work->work_on) {
                 // 日跨ぎ処理
                 $rest->update(["finished_at" => "23:59:59"]);
                 $work->update(["finished_at" => "23:59:59"]);
@@ -290,12 +318,20 @@ class AttendanceController extends Controller
                     "finished_at" => $time,
                 ];
                 Rest::create($param);
+                // ステータス変更 [2:休憩中]->[1:勤務中]
+                $user->update(['status' => 1]);
+                return ['result' => true];
             }
-            // ステータス変更 [2:休憩中]->[1:勤務中]
-            $user->update(['status' => 1]);
+            if($date < $work->work_on) {
+                // 予期せぬエラー
+                return ['result' => false];
+            }
         }
         catch (\Exception $e) {
-            return $e->errorInfo[1];
+            return [
+                'result' => false,
+                'error_code' => $e->errorInfo[1],
+            ];
         }
     }
 }
