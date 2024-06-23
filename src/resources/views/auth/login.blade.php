@@ -8,7 +8,7 @@
 <div class="container">
     <div class="container__heading">ログイン</div>
     <div class="container__content">
-        <form action="/login" class="login-form" method="post">
+        <form action="/auth_first" class="login-form" method="post">
             @csrf
             <div class="form__group">
                 <input type="text" class="form__group-input" name="email" placeholder="メールアドレス" value="{{ old('email') }}">

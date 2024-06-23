@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AttendanceController;
+use App\Http\Controllers\AuthController;
 
 /*
 |--------------------------------------------------------------------------
@@ -13,6 +14,9 @@ use App\Http\Controllers\AttendanceController;
 | contains the "web" middleware group. Now create something great!
 |
 */
+
+Route::get('/auth_first', [AuthController::class, 'showMailAnnounce']);
+Route::post('/auth_first', [AuthController::class, 'authFirst']);
 
 Route::middleware('auth')->group(function () {
     Route::get('/', [AttendanceController::class, 'index']);
