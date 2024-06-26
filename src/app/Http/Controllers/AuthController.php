@@ -10,6 +10,8 @@ use Hash;
 use Illuminate\Support\Str;
 use Carbon\Carbon;
 use Lang;
+use Mail;
+use App\Mail\LoginMail;
 
 class AuthController extends AuthenticatedSessionController
 {
@@ -31,13 +33,18 @@ class AuthController extends AuthenticatedSessionController
             Hash::check($request->password, $user->password)) {
             // token発行と登録
             $token = str::uuid();
-            $expire_at = Carbon::now()->addMinute(1)->format('Y-m-d H:i:s');
+            $expire_at = Carbon::now()->addMinute(10)->format('Y-m-d H:i:s');
             $user->update([
                 'token' => $token,
                 'expire_at' => $expire_at,
             ]);
             // メール送信
             $url = request()->getSchemeAndHttpHost() . "/auth_second?email=" . $user->email . "&token=". $token;
+            // Mail::send('emails.login_mail', [], function($data) use($user, $url) {
+            //     $data   ->to($user->email)
+            //             ->subject('<Atte> ログイン認証用メール')
+            // });
+            Mail::to($user->email)->send(new LoginMail($url));
 
             // メール送信済みページを表示
             return redirect('/auth_first');
