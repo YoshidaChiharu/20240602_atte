@@ -17,6 +17,8 @@ use App\Http\Controllers\AuthController;
 
 Route::get('/auth_first', [AuthController::class, 'showMailAnnounce']);
 Route::post('/auth_first', [AuthController::class, 'authFirst']);
+Route::get('/auth_second', [AuthController::class, 'authSecond']);
+Route::get('/auth_error', [AuthController::class, 'showAuthError']);
 
 Route::middleware('auth')->group(function () {
     Route::get('/', [AttendanceController::class, 'index']);
