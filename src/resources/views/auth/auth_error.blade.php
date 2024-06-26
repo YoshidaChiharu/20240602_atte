@@ -6,11 +6,11 @@
 
 @section('content')
 <div class="container">
-    <div class="container__heading">ログイン認証エラー</div>
+    <div class="container__heading">認証エラー</div>
     <div class="container__content">
-        <p class="error-text">{{ $message }}</p>
+        <p class="error-text">{{ session('message') }}</p>
         <div class="login">
-            <p class="login-text">再度ログインからお試しください</p>
+            <p class="login-text">再度ログインをお試しください</p>
             <a href="/login" class="login-link">ログイン</a>
         </div>
     </div>
