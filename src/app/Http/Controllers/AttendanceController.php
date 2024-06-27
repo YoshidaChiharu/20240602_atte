@@ -57,19 +57,18 @@ class AttendanceController extends Controller
 
     // 日付別勤怠ページ表示 ============================================
     public function showDaily(Request $request) {
-        // dd($request);
         if ($request->has('prev')) {
-            $date = $request->prev;
+            $carbon = new CarbonImmutable($request->prev);
         }
         if ($request->has('next')) {
-            $date = $request->next;
+            $carbon = new CarbonImmutable($request->next);
         }
-        if (empty($date)) {
-            $date = Carbon::now()->format('Y-m-d');
+        if (empty($carbon)) {
+            $carbon = CarbonImmutable::now();
         }
-        $current = new CarbonImmutable($date);
-        $date_prev = $current->subDays(1)->format('Y-m-d');
-        $date_next = $current->addDays(1)->format('Y-m-d');
+        $date = $carbon->format('Y-m-d');
+        $date_prev = $carbon->subDays(1)->format('Y-m-d');
+        $date_next = $carbon->addDays(1)->format('Y-m-d');
 
         $works = Work::where('work_on', $date)->paginate(5);
 
