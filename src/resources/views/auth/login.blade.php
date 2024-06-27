@@ -8,6 +8,9 @@
 <div class="container">
     <div class="container__heading">ログイン</div>
     <div class="container__content">
+        <div class="auth-error">
+            <span class="auth-error__text">{{ session('message') }}</span>
+        </div>
         <form action="/auth_first" class="login-form" method="post">
             @csrf
             <div class="form__group">

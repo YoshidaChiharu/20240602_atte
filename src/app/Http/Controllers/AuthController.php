@@ -15,22 +15,25 @@ use App\Mail\LoginMail;
 
 class AuthController extends AuthenticatedSessionController
 {
-    // メール送信済みページ表示 ================================
+    // メール送信済みページ表示 ============================================================
     public function showMailAnnounce() {
         return view('auth.mail_announce');
     }
 
-    // 認証エラーページ表示
+    // 認証エラーページ表示 ================================================================
     public function showAuthError(Request $request) {
         return view('auth.auth_error');
     }
 
-    // 認証処理：第1段階目(メルアド、パスワードでの認証) =========
+    // 認証処理：第1段階目(メルアド、パスワードでの認証) =====================================
     public function authFirst(LoginRequest $request) {
         $user = User::where('email', $request->email)->first();
+        if (empty($user)) {
+            return redirect('/login')
+                    ->with('message', Lang::get('message.ERR_USER_NOT_FOUND'));
+        }
 
-        if ($user &&
-            Hash::check($request->password, $user->password)) {
+        if (Hash::check($request->password, $user->password)) {
             // token発行と登録
             $token = str::uuid();
             $expire_at = Carbon::now()->addMinute(10)->format('Y-m-d H:i:s');
@@ -40,21 +43,16 @@ class AuthController extends AuthenticatedSessionController
             ]);
             // メール送信
             $url = request()->getSchemeAndHttpHost() . "/auth_second?email=" . $user->email . "&token=". $token;
-            // Mail::send('emails.login_mail', [], function($data) use($user, $url) {
-            //     $data   ->to($user->email)
-            //             ->subject('<Atte> ログイン認証用メール')
-            // });
             Mail::to($user->email)->send(new LoginMail($url));
-
-            // メール送信済みページを表示
-            return redirect('/auth_first');
+            // メール送信済みページへリダイレクト
+            return redirect('/auth_first')->with(['url' => $user->email]);
         } else {
             return redirect('/login')
-                    ->with('message', Lang::get('message.ERR_USER_NOT_FOUND'));
+                    ->with('message', Lang::get('message.ERR_PASSWORD_MISMATCH'));
         }
     }
 
-    // 認証処理：第2段階目(メール送付URLでの認証) ==============
+    // 認証処理：第2段階目(メール送付URLでの認証) ==========================================
     public function authSecond(Request $request) {
         $user = User::where('email', $request->email)->first();
 

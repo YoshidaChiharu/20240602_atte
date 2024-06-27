@@ -11,6 +11,11 @@
     font-weight: bold;
 }
 
+.auth-error__text {
+    color: red;
+    font-weight: bold;
+}
+
 .form__group {
     padding-bottom: 20px;
 }
