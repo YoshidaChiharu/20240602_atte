@@ -8,6 +8,7 @@ use App\Models\Work;
 use App\Models\Rest;
 use Auth;
 use Carbon\Carbon;
+use Carbon\CarbonImmutable;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Lang;
 
@@ -37,7 +38,7 @@ class AttendanceController extends Controller
         if ($request->has('rest_out')) {
             $result = $this->restOut($auths);
         }
-        
+
         // 例外処理エラーメッセージ
         if ($result['result']) {
             $message = null;
@@ -56,25 +57,23 @@ class AttendanceController extends Controller
 
     // 日付別勤怠ページ表示 ============================================
     public function showDaily(Request $request) {
-        if ($request->has('date')) {
-            $date = $request->date;
-        } else {
+        // dd($request);
+        if ($request->has('prev')) {
+            $date = $request->prev;
+        }
+        if ($request->has('next')) {
+            $date = $request->next;
+        }
+        if (empty($date)) {
             $date = Carbon::now()->format('Y-m-d');
         }
         $works = Work::where('work_on', $date)->paginate(5);
 
-        return view('attendance', compact(['date', 'works']));
-    }
+        $current = new CarbonImmutable($date);
+        $date_prev = $current->subDays(1)->format('Y-m-d');
+        $date_next = $current->addDays(1)->format('Y-m-d');
 
-    // 日付別勤怠ページ：日付変更操作 ==================================
-    public function changeDay(Request $request) {
-        $date = new Carbon($request->current);
-        if ($request->has('prev')) {
-            $date = $date->subDays(1)->format('Y-m-d');
-        } elseif ($request->has('next')) {
-            $date = $date->addDays(1)->format('Y-m-d');
-        }
-        return redirect()->route('get.attendance', compact('date'));
+        return view('attendance', compact(['date', 'date_prev', 'date_next', 'works']));
     }
 
     // ユーザー一覧ページ表示 ==========================================

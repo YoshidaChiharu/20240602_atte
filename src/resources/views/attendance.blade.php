@@ -7,12 +7,10 @@
 @section('content')
 <div class="container">
     <div class="selector">
-        <form action="/attendance" method="post">
-            @csrf
-            <input type="hidden" value="{{ $date }}" name="current">
-            <button class="selector__prev" name="prev"><</button>
+        <form action="/attendance" method="get">
+            <button class="selector__prev" name="prev" value="{{ $date_prev }}"><</button>
             <span class="selector__current">{{ $date }}</span>
-            <button class="selector__next" name="next">></button>
+            <button class="selector__next" name="next" value="{{ $date_next }}">></button>
         </form>
     </div>
     <div class="attendance-info">
