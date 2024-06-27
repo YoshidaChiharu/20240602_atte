@@ -26,5 +26,4 @@ Route::middleware('auth')->group(function () {
     Route::get('/attendance', [AttendanceController::class, 'showDaily'])->name('get.attendance');
     Route::get('/user_list', [AttendanceController::class, 'showUserList']);
     Route::get('/user_attendance_list/{user_id}', [AttendanceController::class, 'showUserAttendanceList'])->name('get.user_attendance_list');
-    Route::post('/user_attendance_list/{user_id}', [AttendanceController::class, 'changeYearMonth']);
 });

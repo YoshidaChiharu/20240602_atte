@@ -67,11 +67,11 @@ class AttendanceController extends Controller
         if (empty($date)) {
             $date = Carbon::now()->format('Y-m-d');
         }
-        $works = Work::where('work_on', $date)->paginate(5);
-
         $current = new CarbonImmutable($date);
         $date_prev = $current->subDays(1)->format('Y-m-d');
         $date_next = $current->addDays(1)->format('Y-m-d');
+
+        $works = Work::where('work_on', $date)->paginate(5);
 
         return view('attendance', compact(['date', 'date_prev', 'date_next', 'works']));
     }
@@ -114,13 +114,22 @@ class AttendanceController extends Controller
 
     // ユーザー別勤怠ページ表示 ========================================
     public function showUserAttendanceList(Request $request, $user_id) {
-        if ($request->has('year_month')) {
-            $carbon = new Carbon($request->year_month);
-        } else {
-            $carbon = Carbon::now();
+        if ($request->has('prev')) {
+            $carbon = new CarbonImmutable($request->prev);
+        }
+        if ($request->has('next')) {
+            $carbon = new CarbonImmutable($request->next);
+        }
+        if ($request->has('specify')) {
+            $carbon = new CarbonImmutable($request->specific_month);
+        }
+        if (empty($carbon)) {
+            $carbon = CarbonImmutable::now();
         }
         $year = $carbon->format('Y');
         $month = $carbon->format('m');
+        $prev_year_month = $carbon->subMonth()->format('Y-m');
+        $next_year_month = $carbon->addMonth()->format('Y-m');
 
         $user = User::find($user_id);
         $user_name = $user->name;
@@ -152,22 +161,16 @@ class AttendanceController extends Controller
 
         return view(
             'user_attendance_list',
-            compact(['user_id', 'user_name', 'year', 'month', 'works']),
+            compact([
+                'user_id',
+                'user_name',
+                'year',
+                'month',
+                'prev_year_month',
+                'next_year_month',
+                'works',
+            ]),
         );
-    }
-
-    // ユーザー別勤怠ページ：年月変更操作 ================================
-    public function changeYearMonth(Request $request, $user_id) {
-        if ($request->has('prev')) {
-            $year_month = (new Carbon($request->current))->subMonth();
-        } elseif ($request->has('next')) {
-            $year_month = (new Carbon($request->current))->addMonth();
-        } elseif ($request->has('specify')) {
-            $year_month = new Carbon($request->specific_month);
-        }
-        $year_month = $year_month->format('Y-m');
-
-        return redirect()->route('get.user_attendance_list', compact('user_id', 'year_month'));
     }
 
     // 勤務開始メソッド ================================================

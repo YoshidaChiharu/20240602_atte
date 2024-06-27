@@ -8,20 +8,20 @@
 <div class="container">
     <div class="heading">{{ $user_name }} さんの出勤簿</div>
     <div class="selector">
-        <form action="/user_attendance_list/{{ $user_id }}" method="post">
-            @csrf
-            <div class="selector-center">
-                <input type="hidden" name="current" value="{{ $year }}-{{ $month }}">
-                <button name="prev"><</button>
+        <div class="selector-center">
+            <form action="/user_attendance_list/{{ $user_id }}" method="get">
+                <button name="prev" value="{{ $prev_year_month }}"><</button>
                 <span>{{ $year }}年{{ $month }}月度</span>
-                <button name="next">></button>
-            </div>
-            <div class="selector-right">
+                <button name="next" value="{{ $next_year_month }}">></button>
+            </form>
+        </div>
+        <div class="selector-right">
+            <form action="/user_attendance_list/{{ $user_id }}" method="get">
                 <span>年月指定</span>
                 <input type="month" name="specific_month" value="{{ $year }}-{{ $month }}">
                 <button name="specify">表示</button>
-            </div>
-        </form>
+            </form>
+        </div>
     </div>
     <div class="attendance-info">
         <table class="attendance-table">
