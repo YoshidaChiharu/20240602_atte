@@ -72,16 +72,27 @@ php artisan key:generate
 ```
 5. **`.env` ファイル内の環境変数を以下の通り変更**
 ```
-// 前略
+# 前略
 
 DB_CONNECTION=mysql
-DB_HOST=mysql             # 書き換え箇所
+DB_HOST=mysql
 DB_PORT=3306
-DB_DATABASE=laravel_db    # 書き換え箇所
-DB_USERNAME=laravel_user  # 書き換え箇所
-DB_PASSWORD=laravel_pass  # 書き換え箇所
+DB_DATABASE=laravel_db
+DB_USERNAME=laravel_user
+DB_PASSWORD=laravel_pass
 
-// 後略
+# 中略
+
+MAIL_MAILER=smtp
+MAIL_HOST=smtp.gmail.com
+MAIL_PORT=587
+MAIL_USERNAME=testyoshida68@gmail.com
+MAIL_PASSWORD= #パスワードについては別途共有
+MAIL_ENCRYPTION=tls
+MAIL_FROM_ADDRESS=testyoshida68@gmail.com
+MAIL_FROM_NAME="Atte"
+
+# 後略
 ```
 6. **テーブル作成**
 ```
