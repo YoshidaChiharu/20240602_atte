@@ -41,9 +41,11 @@ class AuthController extends AuthenticatedSessionController
                 'token' => $token,
                 'expire_at' => $expire_at,
             ]);
+
             // メール送信
             $url = request()->getSchemeAndHttpHost() . "/auth_second?email=" . $user->email . "&token=". $token;
             Mail::to($user->email)->send(new LoginMail($url));
+
             // メール送信済みページへリダイレクト
             return redirect('/auth_first')->with(['url' => $user->email]);
         } else {
@@ -63,15 +65,18 @@ class AuthController extends AuthenticatedSessionController
             $expire = new Carbon($user->expire_at);
             if ($expire <= $now) {
                 $user->update(['token' => null, 'expire_at' => null]);
+
                 return redirect('/auth_error')
                         ->with('message', Lang::get('message.ERR_TOKEN_EXPIRED'));
             }
+
             // ログイン処理
             $user->update(['token' => null, 'expire_at' => null]);
             $login_request = (new LoginRequest)->merge([
                 'email' => $request->email,
                 'password' => 'verified',
             ]);
+
             return $this->store($login_request);
         } else {
             // 不正アクセス対応
