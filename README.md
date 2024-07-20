@@ -60,39 +60,18 @@ docker-compose up -d --build
 ```
 3. **`composer` コマンドでパッケージをインストール**
 ```
-docker-compose exec php bash
+docker-compose exec php-fpm bash
 ```
 ```
 composer install
 ```
-4. **`.env` ファイルを作成し、アプリケーションキーを生成**
+4. **アプリケーションキーを生成**
 ```
-cp .env.example .env
 php artisan key:generate
 ```
-5. **`.env` ファイル内の環境変数を以下の通り変更**
+5. **`.env.dev` ファイル内の以下 `MAIL_PASSWORD` 部分に、別途共有済みのパスワードを記述**
 ```
-# 前略
-
-DB_CONNECTION=mysql
-DB_HOST=mysql
-DB_PORT=3306
-DB_DATABASE=laravel_db
-DB_USERNAME=laravel_user
-DB_PASSWORD=laravel_pass
-
-# 中略
-
-MAIL_MAILER=smtp
-MAIL_HOST=smtp.gmail.com
-MAIL_PORT=587
-MAIL_USERNAME=testyoshida68@gmail.com
 MAIL_PASSWORD= #パスワードについては別途共有
-MAIL_ENCRYPTION=tls
-MAIL_FROM_ADDRESS=testyoshida68@gmail.com
-MAIL_FROM_NAME="Atte"
-
-# 後略
 ```
 6. **テーブル作成**
 ```
@@ -101,6 +80,13 @@ php artisan migrate
 7. **ダミーデータ作成**
 ```
 php artisan db:seed
+```
+```
+exit
+```
+8. **(パーミッションエラーが出た場合)以下コマンドでパーミッションを変更**
+```
+sudo chmod -R 777 *
 ```
 
 <p align="right">(<a href="#top">トップへ</a>)</p>
