@@ -15,6 +15,18 @@ $app = new Illuminate\Foundation\Application(
     $_ENV['APP_BASE_PATH'] ?? dirname(__DIR__)
 );
 
+switch ($_SERVER['HTTP_HOST'] ?? 'localhost') {
+    // 開発環境
+    case 'localhost':
+        $app->loadEnvironmentFrom('.env.dev');
+        break;
+
+    // 本番環境
+    case 'ec2-57-180-170-88.ap-northeast-1.compute.amazonaws.com':
+        $app->loadEnvironmentFrom('.env.prod');
+        break;
+}
+
 /*
 |--------------------------------------------------------------------------
 | Bind Important Interfaces
